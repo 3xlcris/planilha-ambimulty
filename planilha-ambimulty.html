@@ -1,1180 +1,514 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Planilha Ambimulty — Precificação de Produtos</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --green-primary: #00C853;
-      --green-dark: #009624;
-      --green-darker: #006B1A;
-      --green-light: #69F0AE;
-      --green-bg: #E8F5E9;
-      --bg-dark: #0F1319;
-      --bg-card: #1A1F2B;
-      --bg-card-hover: #222838;
-      --bg-input: #151A24;
-      --text-primary: #F0F2F5;
-      --text-secondary: #8892A4;
-      --text-muted: #5A6478;
-      --border: #2A3040;
-      --red: #FF5252;
-      --red-bg: #2A1520;
-      --yellow: #FFD740;
-      --yellow-bg: #2A2515;
-      --blue: #448AFF;
-      --blue-bg: #152030;
-      --purple: #B388FF;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg-dark);
-      color: var(--text-primary);
-      min-height: 100vh;
-      overflow-x: auto;
-    }
-
-    /* ===== HEADER ===== */
-    .header {
-      background: linear-gradient(135deg, var(--green-darker) 0%, var(--green-dark) 50%, var(--green-primary) 100%);
-      padding: 28px 40px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .header::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='rgba(255,255,255,0.06)' stroke-width='1'/%3E%3C/svg%3E");
-      pointer-events: none;
-    }
-    .header h1 {
-      font-size: 2.4rem;
-      font-weight: 900;
-      letter-spacing: 6px;
-      text-transform: uppercase;
-      color: #fff;
-      text-shadow: 0 2px 12px rgba(0,0,0,0.3);
-    }
-    .header .subtitle {
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: rgba(255,255,255,0.75);
-      letter-spacing: 3px;
-      margin-top: 4px;
-    }
-    .header .version {
-      position: absolute;
-      top: 12px;
-      right: 20px;
-      font-size: 0.7rem;
-      color: rgba(255,255,255,0.4);
-    }
-
-    /* ===== CONTAINER ===== */
-    .container {
-      max-width: 1600px;
-      margin: 0 auto;
-      padding: 24px 20px 60px;
-    }
-
-    /* ===== SECTION ===== */
-    .section {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      margin-bottom: 24px;
-      overflow: hidden;
-    }
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 16px 24px;
-      background: rgba(0,200,83,0.05);
-      border-bottom: 1px solid var(--border);
-    }
-    .section-header .icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-    }
-    .section-header h2 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--green-light);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-    .section-body {
-      padding: 24px;
-    }
-
-    /* ===== CONFIG GRID ===== */
-    .config-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
-    }
-    .config-item {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .config-item label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
-    .config-item .input-wrap {
-      display: flex;
-      align-items: center;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      transition: border-color 0.2s;
-    }
-    .config-item .input-wrap:focus-within {
-      border-color: var(--green-primary);
-      box-shadow: 0 0 0 3px rgba(0,200,83,0.1);
-    }
-    .config-item .prefix, .config-item .suffix {
-      padding: 8px 10px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      background: rgba(255,255,255,0.02);
-      white-space: nowrap;
-    }
-    .config-item input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text-primary);
-      font-size: 0.92rem;
-      font-weight: 600;
-      padding: 10px 12px;
-      font-family: 'Inter', sans-serif;
-      width: 100%;
-      min-width: 0;
-    }
-    .config-item input::placeholder {
-      color: var(--text-muted);
-    }
-    .config-item .hint {
-      font-size: 0.68rem;
-      color: var(--text-muted);
-      font-style: italic;
-    }
-
-    /* ===== HIGHLIGHT BOX ===== */
-    .highlight-box {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 18px;
-      border-radius: 10px;
-      margin-top: 16px;
-      font-size: 0.82rem;
-      font-weight: 500;
-    }
-    .highlight-box.info {
-      background: var(--blue-bg);
-      border: 1px solid rgba(68,138,255,0.2);
-      color: var(--blue);
-    }
-    .highlight-box.warn {
-      background: var(--yellow-bg);
-      border: 1px solid rgba(255,215,64,0.2);
-      color: var(--yellow);
-    }
-
-    /* ===== PRODUCT TABLE ===== */
-    .table-scroll {
-      overflow-x: auto;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 1800px;
-      font-size: 0.82rem;
-    }
-    thead th {
-      background: linear-gradient(180deg, #1E2636 0%, #1A1F2B 100%);
-      color: var(--text-secondary);
-      font-weight: 700;
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      padding: 12px 10px;
-      text-align: center;
-      border-bottom: 2px solid var(--border);
-      position: sticky;
-      top: 0;
-      white-space: nowrap;
-    }
-    thead th.group-cost { border-bottom: 3px solid #FF5252; }
-    thead th.group-fees { border-bottom: 3px solid #FFD740; }
-    thead th.group-price { border-bottom: 3px solid var(--green-primary); }
-    thead th.group-profit { border-bottom: 3px solid var(--blue); }
-    thead th.group-sim { border-bottom: 3px solid var(--purple); }
-
-    tbody td {
-      padding: 8px 8px;
-      text-align: center;
-      border-bottom: 1px solid rgba(42,48,64,0.5);
-      vertical-align: middle;
-    }
-    tbody tr {
-      transition: background 0.15s;
-    }
-    tbody tr:hover {
-      background: var(--bg-card-hover);
-    }
-    tbody tr.empty-row td {
-      color: var(--text-muted);
-    }
-
-    td input {
-      background: var(--bg-input);
-      border: 1px solid transparent;
-      border-radius: 6px;
-      color: var(--text-primary);
-      font-size: 0.82rem;
-      font-weight: 500;
-      padding: 7px 8px;
-      width: 100%;
-      text-align: center;
-      font-family: 'Inter', sans-serif;
-      transition: border-color 0.2s;
-    }
-    td input:focus {
-      outline: none;
-      border-color: var(--green-primary);
-      box-shadow: 0 0 0 2px rgba(0,200,83,0.15);
-    }
-    td input.input-name {
-      text-align: left;
-      min-width: 160px;
-    }
-    td input.input-link {
-      text-align: left;
-      min-width: 120px;
-      font-size: 0.72rem;
-      color: var(--blue);
-    }
-    td input.input-sm {
-      min-width: 75px;
-    }
-
-    /* ===== CALC CELLS ===== */
-    .calc {
-      font-weight: 600;
-      font-size: 0.82rem;
-      white-space: nowrap;
-    }
-    .calc-cost { color: #FF8A80; }
-    .calc-fee { color: #FFE57F; }
-    .calc-price { color: var(--green-light); font-weight: 700; }
-    .calc-profit { color: var(--blue); }
-    .calc-profit.negative { color: var(--red); }
-    .calc-pct { color: var(--purple); }
-    .calc-sim { font-size: 0.78rem; }
-
-    /* ===== STATUS BADGE ===== */
-    .status-select {
-      background: var(--bg-input);
-      border: 1px solid transparent;
-      border-radius: 6px;
-      color: var(--text-primary);
-      font-size: 0.72rem;
-      font-weight: 600;
-      padding: 6px 4px;
-      text-align: center;
-      font-family: 'Inter', sans-serif;
-      cursor: pointer;
-      width: 90px;
-    }
-    .status-select:focus {
-      outline: none;
-      border-color: var(--green-primary);
-    }
-
-    /* ===== ROW NUMBER ===== */
-    .row-num {
-      color: var(--text-muted);
-      font-size: 0.72rem;
-      font-weight: 600;
-      min-width: 30px;
-    }
-
-    /* ===== BUTTONS ===== */
-    .btn-row {
-      display: flex;
-      gap: 12px;
-      margin-top: 16px;
-      flex-wrap: wrap;
-    }
-    .btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
-      color: #fff;
-    }
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(0,200,83,0.3);
-    }
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text-secondary);
-    }
-    .btn-outline:hover {
-      border-color: var(--text-secondary);
-      color: var(--text-primary);
-    }
-    .btn-danger {
-      background: rgba(255,82,82,0.1);
-      border: 1px solid rgba(255,82,82,0.2);
-      color: var(--red);
-    }
-    .btn-danger:hover {
-      background: rgba(255,82,82,0.2);
-    }
-
-    /* ===== SUMMARY CARDS ===== */
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 16px;
-    }
-    .summary-card {
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 18px;
-      text-align: center;
-    }
-    .summary-card .label {
-      font-size: 0.68rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-    }
-    .summary-card .value {
-      font-size: 1.5rem;
-      font-weight: 800;
-    }
-    .summary-card .sub {
-      font-size: 0.72rem;
-      color: var(--text-secondary);
-      margin-top: 4px;
-    }
-    .summary-card.green .value { color: var(--green-light); }
-    .summary-card.blue .value { color: var(--blue); }
-    .summary-card.yellow .value { color: var(--yellow); }
-    .summary-card.red .value { color: var(--red); }
-    .summary-card.purple .value { color: var(--purple); }
-
-    /* ===== SCENARIO TABLE ===== */
-    .scenario-table {
-      min-width: 800px;
-    }
-    .scenario-table th {
-      background: linear-gradient(180deg, #1E2636 0%, #1A1F2B 100%);
-      padding: 10px 14px;
-    }
-    .scenario-table td {
-      padding: 10px 14px;
-    }
-    .scenario-table .qty-header {
-      background: linear-gradient(135deg, var(--green-darker), var(--green-dark));
-      color: #fff;
-      font-weight: 700;
-    }
-
-    /* ===== LEGEND ===== */
-    .legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      padding: 12px 0;
-      font-size: 0.72rem;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .legend-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 3px;
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 768px) {
-      .header h1 { font-size: 1.6rem; letter-spacing: 3px; }
-      .container { padding: 12px 8px 40px; }
-      .section-body { padding: 16px 12px; }
-      .config-grid { grid-template-columns: 1fr 1fr; }
-    }
-
-    /* ===== GROUP HEADER ROW ===== */
-    .group-row th {
-      font-size: 0.6rem;
-      padding: 4px 8px;
-      color: var(--text-muted);
-      font-weight: 600;
-      letter-spacing: 1.5px;
-    }
-
-    /* ===== TOOLTIP ===== */
-    .tooltip-wrap {
-      position: relative;
-      cursor: help;
-    }
-    .tooltip-wrap .tip {
-      display: none;
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #2A3040;
-      color: var(--text-primary);
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 0.72rem;
-      font-weight: 400;
-      white-space: nowrap;
-      z-index: 100;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-    }
-    .tooltip-wrap:hover .tip {
-      display: block;
-    }
-
-    /* Export btn */
-    .export-bar {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .footer {
-      text-align: center;
-      padding: 30px;
-      color: var(--text-muted);
-      font-size: 0.72rem;
-    }
-    .footer a {
-      color: var(--green-primary);
-      text-decoration: none;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Planilha Ambimulty v4.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0F1319;--card:#1A1F2B;--card2:#161B26;--brd:#2A3040;--inp:#151A24;--grn:#00C853;--grn-l:#69F0AE;--red:#FF5252;--yel:#FFD740;--blu:#448AFF;--pur:#B388FF;--teal:#26A69A;--txt:#F0F2F5;--mut:#8892A4;--dim:#5A6478}
+body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;padding:20px 30px}
+header{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--brd);margin-bottom:20px}
+h1{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#fff 40%,var(--grn));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ver{font-size:.7rem;color:var(--dim);margin-top:2px}
+#saveBadge{font-size:.8rem;color:var(--grn);opacity:.8}
+.card{background:var(--card);border:1px solid var(--brd);border-radius:12px;padding:18px 22px;margin-bottom:18px}
+.card-t{font-size:.95rem;font-weight:700;color:var(--grn);margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px}
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.ci label{font-size:.65rem;text-transform:uppercase;color:var(--mut);letter-spacing:.4px;font-weight:600;display:block;margin-bottom:3px}
+.ci input{background:var(--inp);border:1px solid var(--brd);color:var(--txt);padding:7px 9px;border-radius:7px;font-family:inherit;font-size:.85rem;width:100%;font-weight:600}
+.ci input:focus{outline:none;border-color:var(--grn)}
+.ci .u{color:var(--dim);font-size:.75rem}
+.rbox{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rv{font-size:1.2rem;font-weight:800;color:var(--grn-l)}
+.rd{font-size:.65rem;color:var(--dim)}
+.rb{font-size:.6rem;padding:2px 7px;border-radius:12px;font-weight:600}
+.rb.on{background:rgba(0,200,83,.15);color:var(--grn)}
+.rb.off{background:rgba(255,215,64,.15);color:var(--yel)}
+.btn{padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-family:inherit;font-weight:600;font-size:.78rem;transition:all .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn-g{background:var(--grn);color:#000}
+.btn-o{background:transparent;border:1px solid var(--brd);color:var(--mut)}
+.btn-o:hover{border-color:var(--txt);color:var(--txt)}
+.btn-r{background:transparent;border:1px solid var(--red);color:var(--red)}
+.btn-s{padding:3px 8px;font-size:.65rem}
+.lg{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.lg span{display:flex;align-items:center;gap:5px;font-size:.72rem;color:var(--mut)}
+.lg i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.tip{background:rgba(0,200,83,.06);border:1px solid rgba(0,200,83,.12);border-radius:7px;padding:8px 14px;font-size:.75rem;color:var(--mut);margin-bottom:14px}
+.fb{display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap}
+.fb button{padding:5px 12px;border-radius:16px;border:1px solid var(--brd);background:transparent;color:var(--mut);cursor:pointer;font-family:inherit;font-size:.72rem;font-weight:600;transition:all .15s}
+.fb button:hover,.fb button.act{border-color:var(--grn);color:var(--grn);background:rgba(0,200,83,.07)}
+.tw{overflow-x:auto;border-radius:9px;border:1px solid var(--brd)}
+table{width:100%;border-collapse:collapse;min-width:1480px}
+thead{background:var(--card2)}
+th{padding:7px 5px;font-size:.6rem;text-transform:uppercase;letter-spacing:.3px;color:var(--mut);font-weight:700;white-space:nowrap;position:relative;cursor:help;border-bottom:1px solid var(--brd)}
+th[data-t]:hover::after{content:attr(data-t);position:absolute;top:100%;left:50%;transform:translateX(-50%);background:#000;color:var(--txt);padding:5px 9px;border-radius:5px;font-size:.68rem;white-space:normal;width:190px;z-index:99;font-weight:400;text-transform:none;letter-spacing:0;box-shadow:0 4px 10px rgba(0,0,0,.5)}
+th.gc{border-top:3px solid var(--red)}
+th.gt{border-top:3px solid var(--yel)}
+th.gp{border-top:3px solid var(--grn)}
+th.gr{border-top:3px solid var(--blu)}
+td{padding:5px;border-bottom:1px solid var(--brd);font-size:.78rem}
+td input,td select{background:var(--inp);border:1px solid transparent;color:var(--txt);padding:5px 7px;border-radius:5px;font-family:inherit;font-size:.78rem;width:100%;font-weight:500}
+td input:focus,td select:focus{outline:none;border-color:var(--grn)}
+td select{cursor:pointer;appearance:none;padding-right:18px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%238892A4' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 5px center}
+.cv{background:transparent!important;border:none!important;text-align:right;font-weight:700;padding:5px 7px}
+.cc{color:var(--red)}.ct{color:var(--yel)}.cp{color:var(--teal)}
+tr.md td{background:rgba(255,82,82,.07)}
+tr.md .mc{color:var(--red);font-weight:800;font-size:.85rem}
+tr.mw td{background:rgba(255,215,64,.04)}
+tr.mw .mc{color:var(--yel);font-weight:700}
+tr.mg .mc{color:var(--grn);font-weight:700}
+tr.dead td{opacity:.35}
+tr.paused td{opacity:.55}
+tr:hover td{background:rgba(255,255,255,.02)}
+.db{background:none;border:none;color:var(--dim);cursor:pointer;font-size:.9rem;padding:2px}
+.db:hover{color:var(--red)}
+.acts{display:flex;gap:9px;margin-top:12px;flex-wrap:wrap}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.sc{background:var(--card2);border:1px solid var(--brd);border-radius:9px;padding:14px;text-align:center}
+.sc .sl{font-size:.6rem;text-transform:uppercase;color:var(--mut);letter-spacing:.3px;font-weight:600;margin-bottom:5px}
+.sc .sv{font-size:1.5rem;font-weight:800}
+.sc .ss{font-size:.65rem;color:var(--dim);margin-top:3px}
+.cw{width:100%;height:250px;margin-top:8px}
+.toast{position:fixed;bottom:25px;right:25px;background:var(--card);border:1px solid var(--grn);color:var(--txt);padding:10px 18px;border-radius:9px;font-size:.8rem;z-index:999;opacity:0;transform:translateY(15px);transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+@media(max-width:768px){body{padding:10px}.cg{grid-template-columns:1fr 1fr}.sg{grid-template-columns:1fr 1fr}table{min-width:1200px}}
+</style>
 </head>
 <body>
-
-<!-- ===== HEADER ===== -->
-<div class="header">
-  <span class="version">v3.0 — UK Edition</span>
-  <h1>📊 Planilha Ambimulty</h1>
-  <div class="subtitle">Precificação de Produtos — Reino Unido 🇬🇧</div>
-</div>
-
 <div class="container">
+<header>
+<div><h1>📊 Planilha Ambimulty</h1><div class="ver">v4.0 — Precificação de Produtos UK</div></div>
+<div id="saveBadge">💾 Salvo</div>
+</header>
 
-  <!-- ===== EXPORT BAR ===== -->
-  <div class="export-bar">
-    <button class="btn btn-outline" onclick="exportCSV()">📥 Exportar CSV</button>
-    <button class="btn btn-outline" onclick="saveToLocal()">💾 Salvar Local</button>
-    <button class="btn btn-outline" onclick="loadFromLocal()">📂 Carregar Salvo</button>
-  </div>
-
-  <!-- ===== CONFIGURAÇÕES ===== -->
-  <div class="section">
-    <div class="section-header">
-      <div class="icon">⚙️</div>
-      <h2>Configurações e Taxas</h2>
-    </div>
-    <div class="section-body">
-      <div class="config-grid">
-        <!-- Câmbio -->
-        <div class="config-item">
-          <label>Cotação USD → GBP (£)</label>
-          <div class="input-wrap">
-            <span class="prefix">$1 =</span>
-            <input type="number" id="cfg-usd-gbp" value="0.79" step="0.01" oninput="recalcAll()">
-            <span class="suffix">£</span>
-          </div>
-          <span class="hint">Taxa de câmbio dólar → libra</span>
-        </div>
-
-        <div class="config-item">
-          <label>Cotação BRL → GBP (£)</label>
-          <div class="input-wrap">
-            <span class="prefix">R$1 =</span>
-            <input type="number" id="cfg-brl-gbp" value="0.14" step="0.01" oninput="recalcAll()">
-            <span class="suffix">£</span>
-          </div>
-          <span class="hint">Taxa de câmbio real → libra</span>
-        </div>
-
-        <!-- Wix -->
-        <div class="config-item">
-          <label>Mensalidade Wix (£/mês)</label>
-          <div class="input-wrap">
-            <span class="prefix">£</span>
-            <input type="number" id="cfg-wix-monthly" value="27.00" step="0.01" oninput="recalcAll()">
-          </div>
-          <span class="hint">Plano Business Wix</span>
-        </div>
-
-        <div class="config-item">
-          <label>Taxa Wix Transação (%)</label>
-          <div class="input-wrap">
-            <input type="number" id="cfg-wix-pct" value="0" step="0.1" oninput="recalcAll()">
-            <span class="suffix">%</span>
-          </div>
-          <span class="hint">0% no plano Business</span>
-        </div>
-
-        <!-- Stripe -->
-        <div class="config-item">
-          <label>Taxa Stripe (%)</label>
-          <div class="input-wrap">
-            <input type="number" id="cfg-stripe-pct" value="1.4" step="0.1" oninput="recalcAll()">
-            <span class="suffix">%</span>
-          </div>
-          <span class="hint">1.4% cartões UK / 2.9% intl</span>
-        </div>
-
-        <div class="config-item">
-          <label>Taxa Fixa Stripe (£)</label>
-          <div class="input-wrap">
-            <span class="prefix">£</span>
-            <input type="number" id="cfg-stripe-fixed" value="0.20" step="0.01" oninput="recalcAll()">
-          </div>
-          <span class="hint">£0.20 por transação</span>
-        </div>
-
-        <!-- VAT -->
-        <div class="config-item">
-          <label>UK VAT (%)</label>
-          <div class="input-wrap">
-            <input type="number" id="cfg-vat" value="20" step="0.1" oninput="recalcAll()">
-            <span class="suffix">%</span>
-          </div>
-          <span class="hint">VAT cobrado do cliente</span>
-        </div>
-
-        <!-- Frete -->
-        <div class="config-item">
-          <label>Custo Frete Médio p/ Cliente (£)</label>
-          <div class="input-wrap">
-            <span class="prefix">£</span>
-            <input type="number" id="cfg-shipping" value="3.50" step="0.1" oninput="recalcAll()">
-          </div>
-          <span class="hint">Frete embutido no preço</span>
-        </div>
-
-        <!-- VIP Pass -->
-        <div class="config-item">
-          <label>Margem VIP Pass (%)</label>
-          <div class="input-wrap">
-            <input type="number" id="cfg-vip" value="10" step="1" oninput="recalcAll()">
-            <span class="suffix">%</span>
-          </div>
-          <span class="hint">% adicionado p/ cobrir VIP</span>
-        </div>
-
-        <!-- Marketing -->
-        <div class="config-item">
-          <label>Budget Marketing (%)</label>
-          <div class="input-wrap">
-            <input type="number" id="cfg-marketing" value="20" step="1" oninput="recalcAll()">
-            <span class="suffix">%</span>
-          </div>
-          <span class="hint">% do preço para ads</span>
-        </div>
-
-        <!-- Markup -->
-        <div class="config-item">
-          <label>Markup Mínimo Sugerido</label>
-          <div class="input-wrap">
-            <input type="number" id="cfg-markup" value="3.0" step="0.1" oninput="recalcAll()">
-            <span class="suffix">x</span>
-          </div>
-          <span class="hint">Multiplicador sobre custo total</span>
-        </div>
-
-        <!-- Pedidos mês -->
-        <div class="config-item">
-          <label>Pedidos Estimados / Mês</label>
-          <div class="input-wrap">
-            <input type="number" id="cfg-orders" value="30" step="1" oninput="recalcAll()">
-            <span class="suffix">pedidos</span>
-          </div>
-          <span class="hint">Para rateio custos fixos</span>
-        </div>
-
-        <!-- Ads mês -->
-        <div class="config-item">
-          <label>Orçamento Ads / Mês (£)</label>
-          <div class="input-wrap">
-            <span class="prefix">£</span>
-            <input type="number" id="cfg-ads" value="150.00" step="10" oninput="recalcAll()">
-          </div>
-          <span class="hint">Investimento total em tráfego</span>
-        </div>
-      </div>
-
-      <div class="highlight-box info">
-        💡 <strong>Dica:</strong> O custo do Wix e Ads é rateado por pedido automaticamente. Quanto mais pedidos, menor o custo fixo por produto.
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== LEGENDA ===== -->
-  <div class="section">
-    <div class="section-body" style="padding: 12px 24px;">
-      <div class="legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#FF8A80"></div> Custos</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#FFE57F"></div> Taxas</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--green-light)"></div> Preço de Venda</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Lucro</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> Indicadores</div>
-        <div class="legend-item" style="margin-left:auto; color: var(--yellow);">⚠️ Preencha apenas os campos com fundo escuro</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== TABELA DE PRODUTOS ===== -->
-  <div class="section">
-    <div class="section-header">
-      <div class="icon">📦</div>
-      <h2>Precificação de Produtos</h2>
-    </div>
-    <div class="section-body">
-      <div class="table-scroll">
-        <table id="product-table">
-          <thead>
-            <tr>
-              <th rowspan="2" style="width:35px">#</th>
-              <th rowspan="2">Status</th>
-              <th rowspan="2">Produto</th>
-              <th rowspan="2">Link Fornecedor</th>
-              <th colspan="3" class="group-cost" style="border-bottom-width:3px">💰 CUSTO PRODUTO</th>
-              <th colspan="5" class="group-fees" style="border-bottom-width:3px">📋 TAXAS E ENCARGOS</th>
-              <th colspan="3" class="group-price" style="border-bottom-width:3px">🏷️ PREÇO DE VENDA</th>
-              <th colspan="4" class="group-profit" style="border-bottom-width:3px">📈 LUCRO E INDICADORES</th>
-            </tr>
-            <tr>
-              <!-- CUSTO -->
-              <th class="group-cost">Custo Ali<br>(USD)</th>
-              <th class="group-cost">Frete Ali<br>(USD)</th>
-              <th class="group-cost">Custo Total<br>(£)</th>
-              <!-- TAXAS -->
-              <th class="group-fees">Stripe<br>(£)</th>
-              <th class="group-fees">Wix/Pedido<br>(£)</th>
-              <th class="group-fees">Frete<br>Embutido (£)</th>
-              <th class="group-fees">VIP Pass<br>(£)</th>
-              <th class="group-fees">Mktg<br>(£)</th>
-              <!-- PREÇO -->
-              <th class="group-price">Preço Suger.<br>(£)</th>
-              <th class="group-price">Preço<br>c/ VAT (£)</th>
-              <th class="group-price">Preço<br>Final (£)</th>
-              <!-- LUCRO -->
-              <th class="group-profit">Lucro<br>(£)</th>
-              <th class="group-profit">Margem<br>%</th>
-              <th class="group-profit">CPA<br>Ideal (£)</th>
-              <th class="group-profit">CPA<br>Máx (£)</th>
-            </tr>
-          </thead>
-          <tbody id="product-body">
-          </tbody>
-        </table>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="addRow()">➕ Adicionar Produto</button>
-        <button class="btn btn-outline" onclick="addMultipleRows(5)">➕ +5 Linhas</button>
-        <button class="btn btn-danger" onclick="clearAll()">🗑️ Limpar Tudo</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== RESUMO ===== -->
-  <div class="section">
-    <div class="section-header">
-      <div class="icon">📊</div>
-      <h2>Resumo Geral</h2>
-    </div>
-    <div class="section-body">
-      <div class="summary-grid" id="summary-grid">
-        <div class="summary-card green">
-          <div class="label">Total Produtos</div>
-          <div class="value" id="sum-total">0</div>
-        </div>
-        <div class="summary-card blue">
-          <div class="label">Ticket Médio</div>
-          <div class="value" id="sum-ticket">£0.00</div>
-        </div>
-        <div class="summary-card green">
-          <div class="label">Lucro Médio / Produto</div>
-          <div class="value" id="sum-profit">£0.00</div>
-        </div>
-        <div class="summary-card purple">
-          <div class="label">Margem Média</div>
-          <div class="value" id="sum-margin">0%</div>
-        </div>
-        <div class="summary-card yellow">
-          <div class="label">Custo Fixo / Pedido</div>
-          <div class="value" id="sum-fixed">£0.00</div>
-          <div class="sub">Wix + Ads rateado</div>
-        </div>
-        <div class="summary-card red">
-          <div class="label">CPA Máx Médio</div>
-          <div class="value" id="sum-cpa">£0.00</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== SIMULADOR DE CENÁRIOS ===== -->
-  <div class="section">
-    <div class="section-header">
-      <div class="icon">🎯</div>
-      <h2>Simulador de Cenários — Unidades Vendidas × Margem Líquida</h2>
-    </div>
-    <div class="section-body">
-      <div class="table-scroll">
-        <table class="scenario-table" id="scenario-table">
-          <thead>
-            <tr>
-              <th style="text-align:left">Produto</th>
-              <th class="qty-header">10 un.</th>
-              <th class="qty-header">25 un.</th>
-              <th class="qty-header">50 un.</th>
-              <th class="qty-header">100 un.</th>
-              <th class="qty-header">250 un.</th>
-              <th class="qty-header">500 un.</th>
-              <th class="qty-header">1.000 un.</th>
-            </tr>
-          </thead>
-          <tbody id="scenario-body">
-          </tbody>
-        </table>
-      </div>
-      <div class="highlight-box warn" style="margin-top:16px">
-        ⚠️ <strong>Atenção:</strong> Cenários mostram lucro LÍQUIDO total (lucro unitário × quantidade). Custos fixos já estão embutidos no lucro unitário.
-      </div>
-    </div>
-  </div>
-
+<div class="card" id="configCard">
+<div class="card-t">⚙️ Configurações Globais</div>
+<div class="cg">
+<div class="ci" style="grid-column:span 2">
+<label>💷 Cotação Dólar → Libra Esterlina (£)</label>
+<div class="rbox">
+<span class="rv" id="rateVal">1 USD = £0.7400</span>
+<button class="btn btn-g btn-s" onclick="fetchRate()">🔄 Atualizar</button>
+<span class="rb on" id="rateBadge">✅ Online</span>
+<span class="rd" id="rateDate">—</span>
+</div>
+</div>
+<div class="ci"><label>Taxa Stripe (%)</label><input type="number" id="cfgStripeP" value="1.4" step="0.1" onchange="onCfg()"></div>
+<div class="ci"><label>Taxa Stripe Fixa (£)</label><input type="number" id="cfgStripeF" value="0.20" step="0.01" onchange="onCfg()"></div>
+<div class="ci"><label>VAT (%)</label><input type="number" id="cfgVat" value="20" disabled><div class="u">Embutido no preço</div></div>
+<div class="ci"><label>Markup Mínimo (x)</label><input type="number" id="cfgMarkup" value="3.0" step="0.1" onchange="onCfg()"></div>
+<div class="ci"><label>Pedidos Estimados/Mês</label><input type="number" id="cfgOrders" value="30" step="1" onchange="onCfg()"></div>
+<div class="ci"><label>Orçamento Ads/Mês (£)</label><input type="number" id="cfgAds" value="150" step="10" onchange="onCfg()"></div>
+<div class="ci"><label>Custos Extras/Mês (£)</label><input type="number" id="cfgExtras" value="10" step="1" onchange="onCfg()"><div class="u">Ferramentas, etc.</div></div>
+<div class="ci"><label>Frete Embutido Padrão (£)</label><input type="number" id="cfgFrete" value="3.50" step="0.10" onchange="onCfg()"></div>
+<div class="ci"><label>VIP Pass Padrão (£)</label><input type="number" id="cfgVip" value="0.90" step="0.10" onchange="onCfg()"></div>
+<div class="ci"><label>Marketing (% do preço)</label><input type="number" id="cfgMktg" value="20" step="1" onchange="onCfg()"></div>
+</div>
 </div>
 
-<div class="footer">
-  <p>Planilha Ambimulty v3.0 — Feita com 💚 para dominar o e-commerce UK</p>
-  <p style="margin-top:4px"><a href="https://ambimulty.com" target="_blank">ambimulty.com</a></p>
+<div class="tip">💡 <b>Dica:</b> O custo de Ads e Extras é rateado por pedido. Quanto mais pedidos, menor o custo fixo por produto.</div>
+
+<div class="lg">
+<span><i style="background:var(--red)"></i> Custos</span>
+<span><i style="background:var(--yel)"></i> Taxas</span>
+<span><i style="background:var(--grn)"></i> Preço</span>
+<span><i style="background:var(--blu)"></i> Resultado</span>
+<span><i style="background:var(--pur)"></i> Indicadores</span>
+<span style="margin-left:auto;color:var(--yel)">⚠️ Preencha apenas os campos com fundo escuro</span>
 </div>
 
+<div class="card">
+<div class="card-t">📦 Precificação de Produtos</div>
+<div class="fb" id="filterBar">
+<button class="act" onclick="filterSt('all')">Todos</button>
+<button onclick="filterSt('teste')">🧪 Em Teste</button>
+<button onclick="filterSt('ativo')">✅ Ativo</button>
+<button onclick="filterSt('pausado')">⏸️ Pausado</button>
+<button onclick="filterSt('morto')">💀 Morto</button>
+</div>
+<div class="tw">
+<table id="tbl">
+<thead><tr>
+<th style="width:30px">#</th>
+<th style="width:30px">🗑️</th>
+<th style="width:105px" data-t="Estado do produto: Em Teste, Ativo, Pausado ou Morto">Status</th>
+<th style="width:140px" data-t="Nome do produto como aparece na loja">Produto</th>
+<th style="width:100px" data-t="URL do fornecedor no AliExpress">Link</th>
+<th style="width:100px" data-t="Observações internas sobre o produto">Notas</th>
+<th class="gc" style="width:75px" data-t="Preço do produto no AliExpress em dólares americanos">Custo Ali ($)</th>
+<th class="gc" style="width:75px" data-t="Custo de envio do AliExpress em dólares">Frete Ali ($)</th>
+<th class="gc" style="width:85px" data-t="(Custo + Frete) × Cotação USD/GBP">Custo Total (£)</th>
+<th class="gt" style="width:70px" data-t="Taxa Stripe UK: 1.4% + £0.20 por transação">Stripe (£)</th>
+<th class="gt" style="width:75px" data-t="Valor do frete incluído no preço final">Frete Emb (£)</th>
+<th class="gt" style="width:70px" data-t="Valor do VIP Pass — editável por produto">VIP Pass (£)</th>
+<th class="gt" style="width:65px" data-t="Marketing: % do preço final destinado a ads">Mktg (£)</th>
+<th class="gt" style="width:70px" data-t="(Ads + Extras) ÷ Pedidos/mês">C.Fixo (£)</th>
+<th class="gp" style="width:85px" data-t="Custo Total × Markup mínimo">P.Sugerido (£)</th>
+<th class="gp" style="width:85px" data-t="Preço de venda — edite para sobrescrever o sugerido">P.Final (£)</th>
+<th class="gr" style="width:75px" data-t="Receita - todos os custos e taxas">Lucro (£)</th>
+<th class="gr" style="width:70px" data-t="🔴 <15% perigo 🟡 15-30% atenção 🟢 >30% saudável">Margem %</th>
+<th class="gr" style="width:75px" data-t="Custo máximo por aquisição: Lucro × 30%">CPA Máx (£)</th>
+<th class="gr" style="width:60px" data-t="Unidades/mês para cobrir custos fixos">B.E.</th>
+</tr></thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
+<div class="acts">
+<button class="btn btn-g" onclick="addRow()">➕ Adicionar Produto</button>
+<button class="btn btn-o" onclick="addRows(5)">➕ +5 Linhas</button>
+<button class="btn btn-r" onclick="clearAll()">🗑️ Limpar Tudo</button>
+<button class="btn btn-o" onclick="exportCSV()">📥 Exportar CSV</button>
+</div>
+</div>
+
+<div class="card">
+<div class="card-t">📊 Lucro por Produto</div>
+<div class="cw"><canvas id="chart"></canvas></div>
+</div>
+
+<div class="card">
+<div class="card-t">📋 Resumo Geral</div>
+<div class="sg">
+<div class="sc"><div class="sl">Total Produtos</div><div class="sv" id="smTotal">0</div></div>
+<div class="sc"><div class="sl">Ticket Médio</div><div class="sv" id="smTicket" style="color:var(--teal)">£0.00</div></div>
+<div class="sc"><div class="sl">Lucro Médio/Produto</div><div class="sv" id="smLucro" style="color:var(--blu)">£0.00</div></div>
+<div class="sc"><div class="sl">Margem Média</div><div class="sv" id="smMargem" style="color:var(--pur)">0.0%</div></div>
+<div class="sc"><div class="sl">Custo Fixo/Pedido</div><div class="sv" id="smFixo" style="color:var(--yel)">£0.00</div></div>
+<div class="sc"><div class="sl">CPA Máx Médio</div><div class="sv" id="smCpa" style="color:var(--red)">£0.00</div></div>
+<div class="sc"><div class="sl">Break-even Mensal</div><div class="sv" id="smBe">0 un.</div><div class="ss">Unidades para cobrir custos fixos</div></div>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
 <script>
-  // ===== CONFIG GETTERS =====
-  function cfg(id) { return parseFloat(document.getElementById(id).value) || 0; }
-  function cfgUsdGbp() { return cfg('cfg-usd-gbp'); }
-  function cfgBrlGbp() { return cfg('cfg-brl-gbp'); }
-  function cfgWixMonthly() { return cfg('cfg-wix-monthly'); }
-  function cfgWixPct() { return cfg('cfg-wix-pct') / 100; }
-  function cfgStripePct() { return cfg('cfg-stripe-pct') / 100; }
-  function cfgStripeFixed() { return cfg('cfg-stripe-fixed'); }
-  function cfgVat() { return cfg('cfg-vat') / 100; }
-  function cfgShipping() { return cfg('cfg-shipping'); }
-  function cfgVip() { return cfg('cfg-vip') / 100; }
-  function cfgMarketing() { return cfg('cfg-marketing') / 100; }
-  function cfgMarkup() { return cfg('cfg-markup'); }
-  function cfgOrders() { return cfg('cfg-orders') || 1; }
-  function cfgAds() { return cfg('cfg-ads'); }
+const KEY='planilha-ambimulty-v4',KEY3='planilha-ambimulty';
+let rate=0.74,products=[],saveTimer=null,currentFilter='all';
 
-  let rowCount = 0;
+function gc(id){return document.getElementById(id)}
+function gv(id){return parseFloat(gc(id).value)||0}
+function fmt(v){return'£'+v.toFixed(2)}
+function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}}
 
-  function addRow() {
-    rowCount++;
-    const tbody = document.getElementById('product-body');
-    const tr = document.createElement('tr');
-    tr.id = `row-${rowCount}`;
-    tr.innerHTML = `
-      <td class="row-num">${rowCount}</td>
-      <td>
-        <select class="status-select" onchange="recalcAll()">
-          <option value="ativo">✅ Ativo</option>
-          <option value="teste">🧪 Teste</option>
-          <option value="pausado">⏸️ Pausado</option>
-          <option value="removido">❌ Removido</option>
-        </select>
-      </td>
-      <td><input type="text" class="input-name" placeholder="Nome do produto" oninput="recalcAll()"></td>
-      <td><input type="text" class="input-link" placeholder="Link Ali..." style="max-width:140px"></td>
-      <td><input type="number" class="input-sm" placeholder="0.00" step="0.01" oninput="recalcRow(${rowCount})"></td>
-      <td><input type="number" class="input-sm" placeholder="0.00" step="0.01" oninput="recalcRow(${rowCount})"></td>
-      <td class="calc calc-cost" data-field="custoTotalGbp">£0.00</td>
-      <td class="calc calc-fee" data-field="stripe">£0.00</td>
-      <td class="calc calc-fee" data-field="wixPedido">£0.00</td>
-      <td class="calc calc-fee" data-field="freteEmb">£0.00</td>
-      <td class="calc calc-fee" data-field="vipPass">£0.00</td>
-      <td class="calc calc-fee" data-field="mktg">£0.00</td>
-      <td class="calc calc-price" data-field="precoSugerido">£0.00</td>
-      <td class="calc calc-price" data-field="precoComVat">£0.00</td>
-      <td class="calc calc-price" data-field="precoFinal" style="font-size:0.92rem">£0.00</td>
-      <td class="calc calc-profit" data-field="lucro">£0.00</td>
-      <td class="calc calc-pct" data-field="margem">0%</td>
-      <td class="calc calc-profit" data-field="cpaIdeal">£0.00</td>
-      <td class="calc calc-profit" data-field="cpaMax">£0.00</td>
-    `;
-    tbody.appendChild(tr);
-    recalcRow(rowCount);
+const triggerSave=debounce(()=>{saveData();},800);
+
+function showToast(msg){const t=gc('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+function markUnsaved(){gc('saveBadge').textContent='⏳ Alterações não salvas';gc('saveBadge').style.color='var(--yel)'}
+function markSaved(){gc('saveBadge').textContent='💾 Salvo';gc('saveBadge').style.color='var(--grn)'}
+
+async function fetchRate(){
+  const b=gc('rateBadge'),d=gc('rateDate'),v=gc('rateVal');
+  try{
+    const ctrl=new AbortController();
+    const tid=setTimeout(()=>ctrl.abort(),5000);
+    const r=await fetch('https://api.frankfurter.app/latest?from=USD&to=GBP',{signal:ctrl.signal});
+    clearTimeout(tid);
+    const j=await r.json();
+    rate=j.rates.GBP;
+    v.textContent='1 USD = £'+rate.toFixed(4);
+    b.className='rb on';b.textContent='✅ Online';
+    d.textContent='Atualizado: '+j.date;
+    localStorage.setItem('amb-rate',JSON.stringify({rate,date:j.date,ts:Date.now()}));
+    recalcAll();showToast('✅ Cotação Libra Esterlina atualizada: 1 USD = £'+rate.toFixed(4));
+  }catch(e){
+    const saved=JSON.parse(localStorage.getItem('amb-rate')||'null');
+    if(saved){rate=saved.rate;v.textContent='1 USD = £'+rate.toFixed(4);d.textContent='Offline desde: '+saved.date}
+    else{v.textContent='1 USD = £'+rate.toFixed(4);d.textContent='Cotação padrão'}
+    b.className='rb off';b.textContent='⚠️ Offline';
+    recalcAll();
   }
+}
 
-  function addMultipleRows(n) {
-    for (let i = 0; i < n; i++) addRow();
+function getConfig(){
+  return{stripeP:gv('cfgStripeP'),stripeF:gv('cfgStripeF'),markup:gv('cfgMarkup'),
+    orders:gv('cfgOrders')||1,ads:gv('cfgAds'),extras:gv('cfgExtras'),
+    frete:gv('cfgFrete'),vip:gv('cfgVip'),mktgP:gv('cfgMktg')}
+}
+
+function onCfg(){markUnsaved();recalcAll();triggerSave()}
+
+function addRow(data){
+  const c=getConfig(),i=products.length;
+  const p=data||{st:'teste',nome:'',link:'',notas:'',ca:0,fa:0,fe:c.frete,vp:c.vip,pf:0,custom:false};
+  products.push(p);
+  renderRow(i,p);
+  recalcRow(i);
+  markUnsaved();triggerSave();
+}
+
+function addRows(n){for(let i=0;i<n;i++)addRow()}
+
+function renderRow(i,p){
+  const tr=document.createElement('tr');
+  tr.id='r'+i;tr.dataset.idx=i;
+  const sts={teste:'🧪 Em Teste',ativo:'✅ Ativo',pausado:'⏸️ Pausado',morto:'💀 Morto'};
+  const opts=Object.entries(sts).map(([k,v])=>`<option value="${k}"${p.st===k?' selected':''}>${v}</option>`).join('');
+  tr.innerHTML=`
+<td style="text-align:center;color:var(--dim)">${i+1}</td>
+<td><button class="db" onclick="delRow(${i})">✕</button></td>
+<td><select onchange="onSt(${i},this.value)">${opts}</select></td>
+<td><input type="text" value="${esc(p.nome)}" placeholder="Nome do produto" onchange="onF(${i},'nome',this.value)"></td>
+<td><input type="text" value="${esc(p.link)}" placeholder="Link Ali..." onchange="onF(${i},'link',this.value)" style="font-size:.7rem"></td>
+<td><input type="text" value="${esc(p.notas)}" placeholder="Notas..." onchange="onF(${i},'notas',this.value)" style="font-size:.7rem"></td>
+<td><input type="number" value="${p.ca||''}" placeholder="0.00" step="0.01" oninput="onN(${i},'ca',this)"></td>
+<td><input type="number" value="${p.fa||''}" placeholder="0.00" step="0.01" oninput="onN(${i},'fa',this)"></td>
+<td><input class="cv cc" id="ct${i}" readonly></td>
+<td><input class="cv ct" id="st${i}" readonly></td>
+<td><input type="number" value="${p.fe}" step="0.10" style="width:65px" oninput="onN(${i},'fe',this)"></td>
+<td><input type="number" value="${p.vp}" step="0.10" style="width:60px" oninput="onN(${i},'vp',this)"></td>
+<td><input class="cv ct" id="mk${i}" readonly></td>
+<td><input class="cv ct" id="cf${i}" readonly></td>
+<td><input class="cv cp" id="ps${i}" readonly></td>
+<td><input type="number" id="pf${i}" value="${p.pf||''}" placeholder="Auto" step="0.01" oninput="onPf(${i},this)"></td>
+<td><input class="cv" id="lu${i}" readonly></td>
+<td><input class="cv mc" id="mg${i}" readonly></td>
+<td><input class="cv" id="cp${i}" readonly style="color:var(--pur)"></td>
+<td><input class="cv" id="be${i}" readonly style="color:var(--dim);font-size:.7rem"></td>`;
+  gc('tbody').appendChild(tr);
+  applySt(i,p.st);
+}
+
+function esc(s){return(s||'').replace(/"/g,'&quot;')}
+
+function onF(i,f,v){products[i][f]=v;markUnsaved();triggerSave()}
+function onN(i,f,el){products[i][f]=parseFloat(el.value)||0;recalcRow(i);markUnsaved();triggerSave()}
+function onSt(i,v){products[i].st=v;applySt(i,v);recalcAll();markUnsaved();triggerSave()}
+function onPf(i,el){const v=parseFloat(el.value);products[i].pf=v||0;products[i].custom=!!el.value;recalcRow(i);markUnsaved();triggerSave()}
+
+function applySt(i,st){
+  const tr=gc('r'+i);if(!tr)return;
+  tr.classList.remove('dead','paused');
+  if(st==='morto')tr.classList.add('dead');
+  if(st==='pausado')tr.classList.add('paused');
+  if(currentFilter!=='all'&&st!==currentFilter)tr.style.display='none';
+  else tr.style.display='';
+}
+
+function recalcRow(i){
+  const p=products[i],c=getConfig();
+  const ct=(p.ca+p.fa)*rate;
+  const ps=ct*c.markup;
+  let pf=p.custom&&p.pf?p.pf:ps;
+  if(!p.custom){p.pf=0;const el=gc('pf'+i);if(el&&!el.value)el.value=''}
+  const stripe=pf*(c.stripeP/100)+c.stripeF;
+  const mktg=pf*(c.mktgP/100);
+  const fix=(c.ads+c.extras)/(c.orders||1);
+  const lucro=pf-ct-stripe-p.fe-p.vp-mktg-fix;
+  const marg=pf>0?(lucro/pf)*100:0;
+  const cpa=lucro>0?lucro*0.3:0;
+  const be=lucro>0?Math.ceil((c.ads+c.extras)/lucro):0;
+
+  gc('ct'+i).value=ct.toFixed(2);
+  gc('st'+i).value=stripe.toFixed(2);
+  gc('mk'+i).value=mktg.toFixed(2);
+  gc('cf'+i).value=fix.toFixed(2);
+  gc('ps'+i).value=ps.toFixed(2);
+  if(!p.custom)gc('pf'+i).placeholder=ps.toFixed(2);
+  gc('lu'+i).value=lucro.toFixed(2);
+  gc('mg'+i).value=marg.toFixed(1)+'%';
+  gc('cp'+i).value=cpa.toFixed(2);
+  gc('be'+i).value=be>0?be+' un.':'—';
+
+  // Color by margin
+  const tr=gc('r'+i);if(!tr)return;
+  tr.classList.remove('md','mw','mg');
+  const luEl=gc('lu'+i);
+  if(pf>0&&ct>0){
+    if(marg<15){tr.classList.add('md');luEl.style.color='var(--red)'}
+    else if(marg<30){tr.classList.add('mw');luEl.style.color='var(--yel)'}
+    else{tr.classList.add('mg');luEl.style.color='var(--grn)'}
+  }else{luEl.style.color='var(--dim)'}
+
+  // Store calcs
+  p._ct=ct;p._pf=pf;p._lucro=lucro;p._marg=marg;p._cpa=cpa;p._be=be;
+}
+
+function recalcAll(){products.forEach((_,i)=>recalcRow(i));updateSummary();drawChart()}
+
+function updateSummary(){
+  const active=products.filter(p=>p.st==='ativo'||p.st==='teste');
+  const n=active.length;
+  const c=getConfig();
+  if(n===0){
+    gc('smTotal').textContent='0';gc('smTicket').textContent='£0.00';
+    gc('smLucro').textContent='£0.00';gc('smMargem').textContent='0.0%';
+    gc('smFixo').textContent=fmt((c.ads+c.extras)/(c.orders||1));
+    gc('smCpa').textContent='£0.00';gc('smBe').textContent='— un.';return;
   }
+  const tkt=active.reduce((s,p)=>s+(p._pf||0),0)/n;
+  const luc=active.reduce((s,p)=>s+(p._lucro||0),0)/n;
+  const mar=active.reduce((s,p)=>s+(p._marg||0),0)/n;
+  const cpa=active.reduce((s,p)=>s+(p._cpa||0),0)/n;
+  const fix=(c.ads+c.extras)/(c.orders||1);
+  const avgLuc=luc>0?luc:1;
+  const be=Math.ceil((c.ads+c.extras)/avgLuc);
+  gc('smTotal').textContent=n;
+  gc('smTicket').textContent=fmt(tkt);
+  gc('smLucro').textContent=fmt(luc);gc('smLucro').style.color=luc>0?'var(--blu)':'var(--red)';
+  gc('smMargem').textContent=mar.toFixed(1)+'%';
+  gc('smMargem').style.color=mar<15?'var(--red)':mar<30?'var(--yel)':'var(--grn)';
+  gc('smFixo').textContent=fmt(fix);
+  gc('smCpa').textContent=fmt(cpa);
+  gc('smBe').textContent=(be>0&&be<9999)?be+' un.':'— un.';
+}
 
-  function clearAll() {
-    if (!confirm('Tem certeza que deseja limpar TODOS os produtos?')) return;
-    document.getElementById('product-body').innerHTML = '';
-    rowCount = 0;
-    updateSummary();
-    updateScenarios();
-  }
+function drawChart(){
+  const canvas=gc('chart'),ctx=canvas.getContext('2d');
+  const dpr=window.devicePixelRatio||1;
+  const rect=canvas.parentElement.getBoundingClientRect();
+  canvas.width=rect.width*dpr;canvas.height=250*dpr;
+  canvas.style.width=rect.width+'px';canvas.style.height='250px';
+  ctx.scale(dpr,dpr);
+  const W=rect.width,H=250;
+  ctx.clearRect(0,0,W,H);
 
-  function getRowData(rowId) {
-    const tr = document.getElementById(`row-${rowId}`);
-    if (!tr) return null;
-    const inputs = tr.querySelectorAll('input');
-    const select = tr.querySelector('select');
-    return {
-      tr,
-      status: select ? select.value : 'ativo',
-      name: inputs[0] ? inputs[0].value : '',
-      link: inputs[1] ? inputs[1].value : '',
-      custoAliUsd: parseFloat(inputs[2] ? inputs[2].value : 0) || 0,
-      freteAliUsd: parseFloat(inputs[3] ? inputs[3].value : 0) || 0,
-    };
-  }
+  const pts=products.filter(p=>p.st!=='morto'&&p._pf>0).map((p,i)=>({
+    name:p.nome||'#'+(i+1),lucro:p._lucro||0,marg:p._marg||0}));
+  if(!pts.length){ctx.fillStyle='#5A6478';ctx.font='13px Inter';ctx.fillText('Adicione produtos para ver o gráfico',W/2-130,H/2);return}
 
-  function setField(tr, field, value) {
-    const el = tr.querySelector(`[data-field="${field}"]`);
-    if (el) el.textContent = value;
-  }
+  const maxV=Math.max(...pts.map(p=>Math.abs(p.lucro)),1);
+  const pad={t:30,b:50,l:10,r:10};
+  const bw=Math.min(40,((W-pad.l-pad.r)/pts.length)-8);
+  const gap=(W-pad.l-pad.r-(bw*pts.length))/(pts.length+1);
+  const zeroY=pad.t+(H-pad.t-pad.b)*maxV/(maxV*2||1);
+  const baseY=H-pad.b;
+  const scaleH=(H-pad.t-pad.b)/(maxV*2||1);
 
-  function recalcRow(rowId) {
-    const data = getRowData(rowId);
-    if (!data) return;
-    const { tr, custoAliUsd, freteAliUsd } = data;
+  // Zero line
+  ctx.strokeStyle='#2A3040';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad.l,baseY);ctx.lineTo(W-pad.r,baseY);ctx.stroke();
 
-    // 1. Custo total em GBP
-    const custoTotalUsd = custoAliUsd + freteAliUsd;
-    const custoTotalGbp = custoTotalUsd * cfgUsdGbp();
+  pts.forEach((p,i)=>{
+    const x=pad.l+gap+(bw+gap)*i;
+    const h=Math.abs(p.lucro)*((H-pad.t-pad.b)/maxV)*0.45;
+    const y=p.lucro>=0?baseY-h:baseY;
+    const col=p.marg<15?'#FF5252':p.marg<30?'#FFD740':'#00C853';
 
-    // 2. Custos fixos rateados por pedido
-    const wixPorPedido = cfgWixMonthly() / cfgOrders();
-    const adsPorPedido = cfgAds() / cfgOrders();
+    ctx.fillStyle=col;
+    ctx.beginPath();
+    const r=3;
+    ctx.moveTo(x+r,y);ctx.lineTo(x+bw-r,y);ctx.quadraticCurveTo(x+bw,y,x+bw,y+r);
+    ctx.lineTo(x+bw,y+h-r);ctx.quadraticCurveTo(x+bw,y+h,x+bw-r,y+h);
+    ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);
+    ctx.fill();
 
-    // 3. Frete embutido
-    const freteEmb = cfgShipping();
+    // Value on top
+    ctx.fillStyle=col;ctx.font='bold 10px Inter';ctx.textAlign='center';
+    ctx.fillText('£'+p.lucro.toFixed(2),x+bw/2,y-6);
 
-    // 4. Para calcular o preço, usamos a fórmula reversa
-    // Preço = (CustoTotal + WixPed + Frete + StripeFixo) / (1 - StripePct - WixPct - VipPct - MktgPct)
-    // Depois adicionamos VAT em cima
-
-    const custoBase = custoTotalGbp + wixPorPedido + freteEmb + cfgStripeFixed();
-    const taxaPctTotal = cfgStripePct() + cfgWixPct() + cfgVip() + cfgMarketing();
-    
-    let precoSemVat;
-    if (taxaPctTotal >= 1) {
-      precoSemVat = custoBase * cfgMarkup(); // fallback
-    } else {
-      // Preço mínimo para cobrir custos
-      const precoMinimo = custoBase / (1 - taxaPctTotal);
-      // Preço sugerido com markup
-      const precoMarkup = custoTotalGbp * cfgMarkup();
-      // Usa o maior entre os dois
-      precoSemVat = Math.max(precoMinimo, precoMarkup);
-    }
-
-    const precoComVat = precoSemVat * (1 + cfgVat());
-    // Arredonda para .99
-    const precoFinal = Math.ceil(precoComVat) - 0.01;
-
-    // 5. Calcular taxas sobre preço final
-    const stripeTotal = (precoFinal * cfgStripePct()) + cfgStripeFixed();
-    const wixTax = precoFinal * cfgWixPct();
-    const vipPassCost = precoFinal * cfgVip();
-    const mktgCost = precoFinal * cfgMarketing();
-
-    // 6. Lucro
-    const totalCustos = custoTotalGbp + stripeTotal + wixPorPedido + freteEmb + vipPassCost + mktgCost + wixTax;
-    const lucro = precoFinal - totalCustos;
-    const margem = precoFinal > 0 ? (lucro / precoFinal * 100) : 0;
-
-    // 7. CPA
-    const cpaIdeal = lucro * 0.5; // 50% do lucro
-    const cpaMax = lucro * 0.8; // 80% do lucro
-
-    // Update fields
-    setField(tr, 'custoTotalGbp', `£${custoTotalGbp.toFixed(2)}`);
-    setField(tr, 'stripe', `£${stripeTotal.toFixed(2)}`);
-    setField(tr, 'wixPedido', `£${wixPorPedido.toFixed(2)}`);
-    setField(tr, 'freteEmb', `£${freteEmb.toFixed(2)}`);
-    setField(tr, 'vipPass', `£${vipPassCost.toFixed(2)}`);
-    setField(tr, 'mktg', `£${mktgCost.toFixed(2)}`);
-    setField(tr, 'precoSugerido', `£${precoSemVat.toFixed(2)}`);
-    setField(tr, 'precoComVat', `£${precoComVat.toFixed(2)}`);
-    setField(tr, 'precoFinal', `£${precoFinal.toFixed(2)}`);
-    setField(tr, 'lucro', `£${lucro.toFixed(2)}`);
-    setField(tr, 'margem', `${margem.toFixed(1)}%`);
-    setField(tr, 'cpaIdeal', `£${cpaIdeal.toFixed(2)}`);
-    setField(tr, 'cpaMax', `£${cpaMax.toFixed(2)}`);
-
-    // Color profit
-    const lucroEl = tr.querySelector('[data-field="lucro"]');
-    if (lucroEl) {
-      lucroEl.classList.toggle('negative', lucro < 0);
-    }
-
-    // Store calc data on tr
-    tr._calc = { custoTotalGbp, precoFinal, lucro, margem, cpaMax, name: data.name, status: data.status };
-
-    updateSummary();
-    updateScenarios();
-  }
-
-  function recalcAll() {
-    for (let i = 1; i <= rowCount; i++) {
-      recalcRow(i);
-    }
-  }
-
-  function updateSummary() {
-    const rows = document.querySelectorAll('#product-body tr');
-    let total = 0, totalPrice = 0, totalProfit = 0, totalMargin = 0, totalCpa = 0;
-    let activeCount = 0;
-
-    rows.forEach(tr => {
-      if (tr._calc && tr._calc.status === 'ativo' && tr._calc.precoFinal > 0) {
-        activeCount++;
-        totalPrice += tr._calc.precoFinal;
-        totalProfit += tr._calc.lucro;
-        totalMargin += tr._calc.margem;
-        totalCpa += tr._calc.cpaMax;
-      }
-      if (tr._calc && tr._calc.precoFinal > 0) total++;
-    });
-
-    document.getElementById('sum-total').textContent = total;
-    document.getElementById('sum-ticket').textContent = `£${activeCount > 0 ? (totalPrice / activeCount).toFixed(2) : '0.00'}`;
-    document.getElementById('sum-profit').textContent = `£${activeCount > 0 ? (totalProfit / activeCount).toFixed(2) : '0.00'}`;
-    document.getElementById('sum-margin').textContent = `${activeCount > 0 ? (totalMargin / activeCount).toFixed(1) : '0'}%`;
-
-    const fixedPerOrder = (cfgWixMonthly() + cfgAds()) / cfgOrders();
-    document.getElementById('sum-fixed').textContent = `£${fixedPerOrder.toFixed(2)}`;
-    document.getElementById('sum-cpa').textContent = `£${activeCount > 0 ? (totalCpa / activeCount).toFixed(2) : '0.00'}`;
-  }
-
-  function updateScenarios() {
-    const qtys = [10, 25, 50, 100, 250, 500, 1000];
-    const tbody = document.getElementById('scenario-body');
-    tbody.innerHTML = '';
-
-    const rows = document.querySelectorAll('#product-body tr');
-    rows.forEach(tr => {
-      if (!tr._calc || !tr._calc.name || tr._calc.precoFinal <= 0) return;
-      const scenRow = document.createElement('tr');
-      let cells = `<td style="text-align:left; font-weight:600; color:var(--text-primary)">${tr._calc.name}</td>`;
-      qtys.forEach(qty => {
-        const totalProfit = tr._calc.lucro * qty;
-        const color = totalProfit >= 0 ? 'var(--green-light)' : 'var(--red)';
-        cells += `<td class="calc calc-sim" style="color:${color}; font-weight:600">£${totalProfit.toFixed(2)}</td>`;
-      });
-      scenRow.innerHTML = cells;
-      tbody.appendChild(scenRow);
-    });
-
-    // Total row
-    if (tbody.children.length > 0) {
-      const totalRow = document.createElement('tr');
-      totalRow.style.borderTop = '2px solid var(--green-primary)';
-      let totalCells = `<td style="text-align:left; font-weight:800; color:var(--green-primary)">📊 TOTAL</td>`;
-      qtys.forEach(qty => {
-        let total = 0;
-        rows.forEach(tr => {
-          if (tr._calc && tr._calc.name && tr._calc.precoFinal > 0) {
-            total += tr._calc.lucro * qty;
-          }
-        });
-        const color = total >= 0 ? 'var(--green-light)' : 'var(--red)';
-        totalCells += `<td class="calc" style="color:${color}; font-weight:800; font-size:0.88rem">£${total.toFixed(2)}</td>`;
-      });
-      totalRow.innerHTML = totalCells;
-      tbody.appendChild(totalRow);
-    }
-  }
-
-  // ===== EXPORT CSV =====
-  function exportCSV() {
-    const headers = ['#', 'Status', 'Produto', 'Link', 'Custo Ali (USD)', 'Frete Ali (USD)', 'Custo Total (£)', 'Stripe (£)', 'Wix/Pedido (£)', 'Frete Emb (£)', 'VIP Pass (£)', 'Mktg (£)', 'Preço Sugerido (£)', 'Preço c/ VAT (£)', 'Preço Final (£)', 'Lucro (£)', 'Margem %', 'CPA Ideal (£)', 'CPA Máx (£)'];
-    let csv = headers.join(',') + '\n';
-
-    const rows = document.querySelectorAll('#product-body tr');
-    rows.forEach((tr, i) => {
-      const inputs = tr.querySelectorAll('input');
-      const select = tr.querySelector('select');
-      const calcs = tr.querySelectorAll('.calc');
-      const vals = [
-        i + 1,
-        select ? select.value : '',
-        inputs[0] ? `"${inputs[0].value}"` : '',
-        inputs[1] ? `"${inputs[1].value}"` : '',
-        inputs[2] ? inputs[2].value : '',
-        inputs[3] ? inputs[3].value : '',
-      ];
-      calcs.forEach(c => vals.push(`"${c.textContent}"`));
-      csv += vals.join(',') + '\n';
-    });
-
-    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'ambimulty_precificacao.csv';
-    link.click();
-  }
-
-  // ===== LOCAL STORAGE =====
-  function saveToLocal() {
-    const data = {
-      config: {
-        usdGbp: cfg('cfg-usd-gbp'),
-        brlGbp: cfg('cfg-brl-gbp'),
-        wixMonthly: cfg('cfg-wix-monthly'),
-        wixPct: cfg('cfg-wix-pct'),
-        stripePct: cfg('cfg-stripe-pct'),
-        stripeFixed: cfg('cfg-stripe-fixed'),
-        vat: cfg('cfg-vat'),
-        shipping: cfg('cfg-shipping'),
-        vip: cfg('cfg-vip'),
-        marketing: cfg('cfg-marketing'),
-        markup: cfg('cfg-markup'),
-        orders: cfg('cfg-orders'),
-        ads: cfg('cfg-ads'),
-      },
-      products: []
-    };
-
-    const rows = document.querySelectorAll('#product-body tr');
-    rows.forEach(tr => {
-      const inputs = tr.querySelectorAll('input');
-      const select = tr.querySelector('select');
-      data.products.push({
-        status: select ? select.value : 'ativo',
-        name: inputs[0] ? inputs[0].value : '',
-        link: inputs[1] ? inputs[1].value : '',
-        custoAli: inputs[2] ? inputs[2].value : '',
-        freteAli: inputs[3] ? inputs[3].value : '',
-      });
-    });
-
-    localStorage.setItem('ambimulty_planilha', JSON.stringify(data));
-    alert('✅ Planilha salva com sucesso!');
-  }
-
-  function loadFromLocal() {
-    const saved = localStorage.getItem('ambimulty_planilha');
-    if (!saved) {
-      alert('❌ Nenhum dado salvo encontrado.');
-      return;
-    }
-
-    const data = JSON.parse(saved);
-
-    // Restore config
-    if (data.config) {
-      document.getElementById('cfg-usd-gbp').value = data.config.usdGbp;
-      document.getElementById('cfg-brl-gbp').value = data.config.brlGbp;
-      document.getElementById('cfg-wix-monthly').value = data.config.wixMonthly;
-      document.getElementById('cfg-wix-pct').value = data.config.wixPct;
-      document.getElementById('cfg-stripe-pct').value = data.config.stripePct;
-      document.getElementById('cfg-stripe-fixed').value = data.config.stripeFixed;
-      document.getElementById('cfg-vat').value = data.config.vat;
-      document.getElementById('cfg-shipping').value = data.config.shipping;
-      document.getElementById('cfg-vip').value = data.config.vip;
-      document.getElementById('cfg-marketing').value = data.config.marketing;
-      document.getElementById('cfg-markup').value = data.config.markup;
-      document.getElementById('cfg-orders').value = data.config.orders;
-      document.getElementById('cfg-ads').value = data.config.ads;
-    }
-
-    // Restore products
-    document.getElementById('product-body').innerHTML = '';
-    rowCount = 0;
-    if (data.products) {
-      data.products.forEach(p => {
-        addRow();
-        const tr = document.getElementById(`row-${rowCount}`);
-        const inputs = tr.querySelectorAll('input');
-        const select = tr.querySelector('select');
-        if (select) select.value = p.status;
-        if (inputs[0]) inputs[0].value = p.name;
-        if (inputs[1]) inputs[1].value = p.link;
-        if (inputs[2]) inputs[2].value = p.custoAli;
-        if (inputs[3]) inputs[3].value = p.freteAli;
-        recalcRow(rowCount);
-      });
-    }
-
-    alert('✅ Planilha carregada com sucesso!');
-  }
-
-  // ===== INIT =====
-  // Start with 10 empty rows
-  window.addEventListener('DOMContentLoaded', () => {
-    addMultipleRows(10);
+    // Name below
+    ctx.fillStyle='#8892A4';ctx.font='9px Inter';
+    const nm=p.name.length>8?p.name.slice(0,7)+'…':p.name;
+    ctx.fillText(nm,x+bw/2,baseY+16);
   });
-</script>
+}
 
+function filterSt(s){
+  currentFilter=s;
+  gc('filterBar').querySelectorAll('button').forEach(b=>{
+    b.classList.toggle('act',b.textContent.toLowerCase().includes(s==='all'?'todos':s))});
+  products.forEach((p,i)=>{
+    const tr=gc('r'+i);if(!tr)return;
+    tr.style.display=(s==='all'||p.st===s)?'':'none';
+  });
+}
+
+function delRow(i){
+  if(!confirm('Excluir produto #'+(i+1)+'?'))return;
+  products.splice(i,1);
+  gc('tbody').innerHTML='';
+  products.forEach((p,j)=>renderRow(j,p));
+  recalcAll();markUnsaved();triggerSave();
+  showToast('🗑️ Produto removido');
+}
+
+function clearAll(){
+  if(!confirm('⚠️ Limpar TODOS os produtos? Esta ação não pode ser desfeita.'))return;
+  products=[];gc('tbody').innerHTML='';
+  recalcAll();markUnsaved();triggerSave();
+  showToast('🗑️ Planilha limpa');
+}
+
+function exportCSV(){
+  const h=['#','Status','Produto','Link','Notas','Custo Ali $','Frete Ali $','Custo Total £','Stripe £','Frete Emb £','VIP Pass £','Mktg £','C.Fixo £','P.Sugerido £','P.Final £','Lucro £','Margem %','CPA Máx £','Break-even'];
+  const rows=products.map((p,i)=>[i+1,p.st,p.nome,p.link,p.notas,p.ca,p.fa,
+    (p._ct||0).toFixed(2),(p._pf*(gv('cfgStripeP')/100)+gv('cfgStripeF')).toFixed(2),
+    p.fe,p.vp,(p._pf*(gv('cfgMktg')/100)).toFixed(2),
+    ((gv('cfgAds')+gv('cfgExtras'))/(gv('cfgOrders')||1)).toFixed(2),
+    (p._ct*gv('cfgMarkup')).toFixed(2),(p._pf||0).toFixed(2),
+    (p._lucro||0).toFixed(2),(p._marg||0).toFixed(1)+'%',
+    (p._cpa||0).toFixed(2),p._be||'—'].join(','));
+  const csv=h.join(',')+'\n'+rows.join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='ambimulty-precificacao.csv';a.click();
+  showToast('📥 CSV exportado!');
+}
+
+function saveData(){
+  const cfg={stripeP:gv('cfgStripeP'),stripeF:gv('cfgStripeF'),markup:gv('cfgMarkup'),
+    orders:gv('cfgOrders'),ads:gv('cfgAds'),extras:gv('cfgExtras'),
+    frete:gv('cfgFrete'),vip:gv('cfgVip'),mktgP:gv('cfgMktg')};
+  const data={version:'4.0',config:cfg,products:products.map(p=>({
+    st:p.st,nome:p.nome,link:p.link,notas:p.notas,ca:p.ca,fa:p.fa,fe:p.fe,vp:p.vp,pf:p.pf,custom:p.custom
+  })),lastSaved:new Date().toISOString()};
+  localStorage.setItem(KEY,JSON.stringify(data));
+  markSaved();
+}
+
+function loadData(){
+  const raw=localStorage.getItem(KEY);
+  if(raw){
+    try{
+      const d=JSON.parse(raw);
+      if(d.config){
+        gc('cfgStripeP').value=d.config.stripeP??1.4;
+        gc('cfgStripeF').value=d.config.stripeF??0.20;
+        gc('cfgMarkup').value=d.config.markup??3.0;
+        gc('cfgOrders').value=d.config.orders??30;
+        gc('cfgAds').value=d.config.ads??150;
+        gc('cfgExtras').value=d.config.extras??10;
+        gc('cfgFrete').value=d.config.frete??3.50;
+        gc('cfgVip').value=d.config.vip??0.90;
+        gc('cfgMktg').value=d.config.mktgP??20;
+      }
+      if(d.products&&d.products.length){d.products.forEach(p=>addRow(p));return true}
+    }catch(e){}
+  }
+  // Try v3 migration
+  const v3=localStorage.getItem(KEY3);
+  if(v3){
+    try{
+      const d=JSON.parse(v3);
+      if(d.products||d.rows||Array.isArray(d)){
+        const arr=d.products||d.rows||d;
+        arr.forEach(p=>{
+          addRow({st:p.status||p.st||'ativo',nome:p.nome||p.product||'',
+            link:p.link||p.link_fornecedor||'',notas:'',
+            ca:p.custo_ali||p.ca||0,fa:p.frete_ali||p.fa||0,
+            fe:p.frete_embutido||p.fe||3.50,vp:p.vip_pass||p.vp||0.90,
+            pf:p.preco_final||p.pf||0,custom:!!(p.preco_final||p.pf)});
+        });
+        showToast('📦 Dados da v3.0 importados com sucesso!');return true;
+      }
+    }catch(e){}
+  }
+  return false;
+}
+
+window.addEventListener('resize',debounce(drawChart,200));
+
+function init(){
+  const loaded=loadData();
+  if(!loaded){for(let i=0;i<5;i++)addRow()}
+  fetchRate();
+  recalcAll();
+  markSaved();
+}
+init();
+</script>
 </body>
 </html>
