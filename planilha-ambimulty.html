@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data:; connect-src https://api.frankfurter.app; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
 <title>Planilha Ambimulty v4.0</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -231,7 +233,7 @@ function onCfg(){markUnsaved();recalcAll();triggerSave()}
 
 function addRow(data){
   const c=getConfig(),i=products.length;
-  const p=data||{st:'teste',nome:'',link:'',notas:'',ca:0,fa:0,fe:c.frete,vp:c.vip,pf:0,custom:false};
+  const p=data?cleanP(data):{st:'teste',nome:'',link:'',notas:'',ca:0,fa:0,fe:c.frete,vp:c.vip,pf:0,custom:false};
   products.push(p);
   renderRow(i,p);
   recalcRow(i);
@@ -252,16 +254,16 @@ function renderRow(i,p){
 <td><input type="text" value="${esc(p.nome)}" placeholder="Nome do produto" onchange="onF(${i},'nome',this.value)"></td>
 <td><input type="text" value="${esc(p.link)}" placeholder="Link Ali..." onchange="onF(${i},'link',this.value)" style="font-size:.7rem"></td>
 <td><input type="text" value="${esc(p.notas)}" placeholder="Notas..." onchange="onF(${i},'notas',this.value)" style="font-size:.7rem"></td>
-<td><input type="number" value="${p.ca||''}" placeholder="0.00" step="0.01" oninput="onN(${i},'ca',this)"></td>
-<td><input type="number" value="${p.fa||''}" placeholder="0.00" step="0.01" oninput="onN(${i},'fa',this)"></td>
+<td><input type="number" value="${num(p.ca)||''}" placeholder="0.00" step="0.01" oninput="onN(${i},'ca',this)"></td>
+<td><input type="number" value="${num(p.fa)||''}" placeholder="0.00" step="0.01" oninput="onN(${i},'fa',this)"></td>
 <td><input class="cv cc" id="ct${i}" readonly></td>
 <td><input class="cv ct" id="st${i}" readonly></td>
-<td><input type="number" value="${p.fe}" step="0.10" style="width:65px" oninput="onN(${i},'fe',this)"></td>
-<td><input type="number" value="${p.vp}" step="0.10" style="width:60px" oninput="onN(${i},'vp',this)"></td>
+<td><input type="number" value="${num(p.fe)}" step="0.10" style="width:65px" oninput="onN(${i},'fe',this)"></td>
+<td><input type="number" value="${num(p.vp)}" step="0.10" style="width:60px" oninput="onN(${i},'vp',this)"></td>
 <td><input class="cv ct" id="mk${i}" readonly></td>
 <td><input class="cv ct" id="cf${i}" readonly></td>
 <td><input class="cv cp" id="ps${i}" readonly></td>
-<td><input type="number" id="pf${i}" value="${p.pf||''}" placeholder="Auto" step="0.01" oninput="onPf(${i},this)"></td>
+<td><input type="number" id="pf${i}" value="${num(p.pf)||''}" placeholder="Auto" step="0.01" oninput="onPf(${i},this)"></td>
 <td><input class="cv" id="lu${i}" readonly></td>
 <td><input class="cv mc" id="mg${i}" readonly></td>
 <td><input class="cv" id="cp${i}" readonly style="color:var(--pur)"></td>
@@ -270,7 +272,20 @@ function renderRow(i,p){
   applySt(i,p.st);
 }
 
-function esc(s){return(s||'').replace(/"/g,'&quot;')}
+/* Segurança (XSS): todo texto vindo do usuário ou do localStorage é escapado antes de ir para o HTML,
+   e todo número é forçado a ser número. Nada de texto cru dentro de innerHTML. */
+const ESC_MAP={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'};
+function esc(s){return String(s==null?'':s).replace(/[&<>"'`]/g,c=>ESC_MAP[c])}
+function num(v){const x=parseFloat(v);return Number.isFinite(x)?x:0}
+const STATUS_OK=['teste','ativo','pausado','morto'];
+function cleanP(p){
+  p=p&&typeof p==='object'?p:{};
+  return{st:STATUS_OK.includes(p.st)?p.st:'teste',
+    nome:String(p.nome==null?'':p.nome).slice(0,200),
+    link:String(p.link==null?'':p.link).slice(0,500),
+    notas:String(p.notas==null?'':p.notas).slice(0,500),
+    ca:num(p.ca),fa:num(p.fa),fe:num(p.fe),vp:num(p.vp),pf:num(p.pf),custom:!!p.custom}
+}
 
 function onF(i,f,v){products[i][f]=v;markUnsaved();triggerSave()}
 function onN(i,f,el){products[i][f]=parseFloat(el.value)||0;recalcRow(i);markUnsaved();triggerSave()}
@@ -434,7 +449,9 @@ function clearAll(){
 
 function exportCSV(){
   const h=['#','Status','Produto','Link','Notas','Custo Ali $','Frete Ali $','Custo Total £','Stripe £','Frete Emb £','VIP Pass £','Mktg £','C.Fixo £','P.Sugerido £','P.Final £','Lucro £','Margem %','CPA Máx £','Break-even'];
-  const rows=products.map((p,i)=>[i+1,p.st,p.nome,p.link,p.notas,p.ca,p.fa,
+  /* Texto do usuário vai entre aspas e, se começar com = + - @, ganha um apóstrofo: evita injeção de fórmula no Excel/Sheets */
+  const tx=v=>{let s=String(v==null?'':v);if(/^[=+\-@\t\r]/.test(s))s="'"+s;return'"'+s.replace(/"/g,'""')+'"'};
+  const rows=products.map((p,i)=>[i+1,tx(p.st),tx(p.nome),tx(p.link),tx(p.notas),p.ca,p.fa,
     (p._ct||0).toFixed(2),(p._pf*(gv('cfgStripeP')/100)+gv('cfgStripeF')).toFixed(2),
     p.fe,p.vp,(p._pf*(gv('cfgMktg')/100)).toFixed(2),
     ((gv('cfgAds')+gv('cfgExtras'))/(gv('cfgOrders')||1)).toFixed(2),
