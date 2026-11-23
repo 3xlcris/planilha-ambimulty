@@ -6,3 +6,4 @@
 - Meça alinhamento e espaçamento (screenshot e medição) antes de entregar; não confie no olho.
 - Verifique todas as páginas (home, produto, coleção, FAQ, políticas, rastreio, carrinho, busca, 404) antes de entregar; um erro corrigido numa página não pode continuar nas outras.
 - Efeitos: micro-interações sutis e dentro da marca (verde-limão, verde-floresta, pílulas, títulos grandes), sempre respeitando "reduzir movimento".
+- Versão nova do tema feita duplicando o tema ao vivo leva só o que está publicado: compare arquivo por arquivo com a versão salva e reaplique o que faltar antes de entregar (já trouxe de volta coisas removidas na v43 e na v48).
