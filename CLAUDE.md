@@ -12,3 +12,4 @@
 - Preço comparativo ("de £X por £Y"): o dono usa para mostrar desconto; a página mostra a economia calculada sozinha a partir do preço riscado. Lembrar que no Reino Unido o preço anterior precisa ser real.
 - Nunca mostrar ao cliente a quantidade em estoque.
 - Produto importado pelo DSers fica com estoque só no local do DSers, que não tem frete: ativar o produto também no local que tem frete, senão a página mostra "Unavailable".
+- Produto com cores: cada cor tem a sua foto ligada à variante, para a galeria pular para a foto certa quando o cliente clica na cor. O nome da cor tem que bater com a foto (o Birdhaven veio do fornecedor com "Green" numa foto turquesa) e usar grafia britânica (Grey, Colour). Conferir abrindo a página com ?variant=<id> de cada cor.
